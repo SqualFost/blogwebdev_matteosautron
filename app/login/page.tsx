@@ -1,25 +1,31 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+// Définir les types pour les états
+interface User {
+  email: string;
+  password: string;
+}
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const router = useRouter();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
       // Lire le fichier user.json depuis le dossier public
-      const response = await fetch("/data/user.json");
+      const response = await fetch('/data/user.json');
       if (!response.ok) {
-        throw new Error("Erreur lors de la lecture des utilisateurs");
+        throw new Error('Erreur lors de la lecture des utilisateurs');
       }
 
-      const users = await response.json();
+      const users: User[] = await response.json();
 
       // Vérifier les informations d'identification
       const user = users.find(
@@ -28,15 +34,17 @@ const Login = () => {
 
       if (user) {
         // Stocker l'état de connexion dans localStorage
-        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userEmail', email); // Stocker l'email de l'utilisateur connecté
+
         // Rediriger vers la page d'accueil
-        router.push("/");
+        router.push('/');
       } else {
-        setErrorMessage("Email ou mot de passe incorrect.");
+        setErrorMessage('Email ou mot de passe incorrect.');
       }
     } catch (error) {
       console.error(error);
-      setErrorMessage("Une erreur s'est produite. Veuillez réessayer.");
+      setErrorMessage('Une erreur s\'est produite. Veuillez réessayer.');
     }
   };
 
@@ -64,7 +72,7 @@ const Login = () => {
             required
           />
         </div>
-        {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+        {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
         <button type="submit">Valider</button>
       </form>
     </div>
